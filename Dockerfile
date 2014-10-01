@@ -19,13 +19,11 @@ ADD yaml.so /usr/lib/php5/20121212/yaml.so
 RUN echo "extension=yaml.so" > /etc/php5/mods-available/yaml.ini && \
     php5enmod yaml
 	
-# Install Friso && Robbe
+# Install Friso
 ADD libfriso.so /usr/lib/libfriso.so
-ADD robbe.so /usr/lib/php5/20121212/robbe.so
-RUN echo "extension=robbe.so" > /etc/php5/mods-available/robbe.ini && \
-    echo "[robbe]" >> /etc/php5/mods-available/robbe.ini && \
-    echo "robbe.ini_file=/etc/friso/friso.ini" >> /etc/php5/mods-available/robbe.ini && \
-    php5enmod robbe
+ADD friso.so /usr/lib/php5/20121212/friso.so
+RUN printf "extension=friso.so\n[friso]\nfriso.ini_file=/etc/friso/friso.ini\n" > /etc/php5/mods-available/friso.ini && \
+    php5enmod friso
 ADD friso /etc/friso
 
 # Install Development Tools
