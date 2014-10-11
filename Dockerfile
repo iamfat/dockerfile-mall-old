@@ -40,6 +40,16 @@ RUN \
 RUN apt-get install -y msmtp-mta
 ADD msmtprc /etc/msmtprc
 
+# Install Oracle
+RUN apt-get install -y alien libaio1
+ADD oci8.so /usr/lib/php5/20121212/oci8.so
+RUN echo "extension=oci8.so" > /etc/php5/mods-available/oci8.ini && \
+    php5enmod oci8
+# We need to download oracle rpm and install it to the container manually..
+# curl -sLo /tmp/oracle-instantclient11.2-basiclite-11.2.0.4.0-1.x86_64.rpm http://path/to/oracle.rpm
+# alien -i /tmp/oracle-instantclient11.2-basiclite-11.2.0.4.0-1.x86_64.rpm
+
+
 EXPOSE 9000
 
 ADD start /start
