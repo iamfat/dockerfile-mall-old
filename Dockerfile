@@ -26,6 +26,12 @@ RUN printf "extension=friso.so\n[friso]\nfriso.ini_file=/etc/friso/friso.ini\n" 
     php5enmod friso
 ADD friso /etc/friso
 
+# Install ZeroMQ
+RUN curl -sLo /usr/local/lib/libzmq.so.4.0.0 http://d.genee.cn/packages/zeromq-4/libzmq.so.4.0.0 && \
+    curl -sLo /usr/lib/php5/20121212/zmq.so http://d.genee.cn/packages/zmq.so && \
+    printf "extension=zmq.so\n" > /etc/php5/mods-available/zmq.ini && \
+    ldconfig && php5enmod zmq
+
 # Install Development Tools
 RUN apt-get install -y git
 
@@ -41,14 +47,14 @@ RUN apt-get install -y msmtp-mta
 ADD msmtprc /etc/msmtprc
 
 # Install Oracle
-RUN apt-get install -y alien libaio1
-ADD oci8.so /usr/lib/php5/20121212/oci8.so
-RUN echo "extension=oci8.so" > /etc/php5/mods-available/oci8.ini && \
-    php5enmod oci8
-# We need to download oracle rpm and install it to the container manually..
-# curl -sLo /tmp/oracle-instantclient11.2-basiclite-11.2.0.4.0-1.x86_64.rpm http://path/to/oracle.rpm
-# alien -i /tmp/oracle-instantclient11.2-basiclite-11.2.0.4.0-1.x86_64.rpm
+RUN apt-get install -y alien libaio1 && \
+    curl -sLo /tmp/oracle.rpm \
+        http://d.genee.cn/packages/oracle-instantclient11.2-basiclite-11.2.0.4.0-1.x86_64.rpm && \
+    alien -i /tmp/oracle.rpm
 
+RUN curl -sLo /usr/lib/php5/20121212/oci8.so http://d.genee.cn/packages/oci8.so && \
+    echo "extension=oci8.so" > /etc/php5/mods-available/oci8.ini && \
+    php5enmod oci8
 
 EXPOSE 9000
 
