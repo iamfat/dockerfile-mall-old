@@ -56,7 +56,14 @@ RUN curl -sLo /usr/lib/php5/20121212/oci8.so http://d.genee.cn/packages/oci8.so 
     echo "extension=oci8.so" > /etc/php5/mods-available/oci8.ini && \
     php5enmod oci8
 
+# Install xlsx2csv
+RUN apt-get install -y python-setuptools && \
+    easy_install xlsx2csv
+
 EXPOSE 9000
+
+# Add interactive shell
+ADD interactive.sh /interactive.sh
 
 ADD start /start
 CMD ["/start"]
