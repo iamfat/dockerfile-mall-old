@@ -1,7 +1,12 @@
 FROM debian:7.6
 MAINTAINER maintain@geneegroup.com
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive \
+    TERM="xterm-color" \
+    MAIL_HOST="172.17.0.1" \
+    MAIL_FROM="sender@gini" \
+    COMPOSER_PROCESS_TIMEOUT=40000 \
+    COMPOSER_HOME="/usr/local/share/composer"
 
 # Install cURL
 RUN apt-get update && apt-get install -y curl apt-utils
@@ -42,15 +47,20 @@ RUN \
     locale-gen && \
     /usr/sbin/update-locale LANG="en_US.UTF-8" LANGUAGE="en_US:en"
 
+# Install Composer
+RUN mkdir -p /usr/local/bin && (curl -sL https://getcomposer.org/installer | php) && \
+    mv composer.phar /usr/local/bin/composer && \
+    echo 'export PATH="/usr/local/share/composer/vendor/bin:$PATH"' >> /etc/profile.d/composer.sh
+
 # Install msmtp-mta
 RUN apt-get install -y msmtp-mta
 ADD msmtprc /etc/msmtprc
 
 # Install Oracle
 RUN apt-get install -y alien libaio1 && \
-    curl -sLo /tmp/oracle.rpm \
+    curl -sLo oracle.rpm \
         http://d.genee.cn/packages/oracle-instantclient11.2-basiclite-11.2.0.4.0-1.x86_64.rpm && \
-    alien -i /tmp/oracle.rpm
+    alien -i oracle.rpm && rm oracle.rpm
 
 RUN curl -sLo /usr/lib/php5/20121212/oci8.so http://d.genee.cn/packages/oci8.so && \
     echo "extension=oci8.so" > /etc/php5/mods-available/oci8.ini && \
