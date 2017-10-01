@@ -29,7 +29,7 @@ RUN apt-get update \
         && sed -i 's/^\;error_log\s*=\s*syslog\s*$/error_log = syslog/' /etc/php5/fpm/php.ini \
         && sed -i 's/^\;error_log\s*=\s*syslog\s*$/error_log = syslog/' /etc/php5/cli/php.ini \
     && PHP_EXTENSION_DIR=$(echo '<?= PHP_EXTENSION_DIR ?>'|php5) \
-        && PHP_MODULE_DIR=$(echo '<?= basename(PHP_EXTENSION_DIR) ?>'|php5) \
+        && PHP_MODULE_DIR=php-$(echo '<?= basename(PHP_EXTENSION_DIR) ?>'|php5) \
     && curl -sLo "${PHP_EXTENSION_DIR}/yaml.so" "http://files.docker.genee.in/debian/${PHP_MODULE_DIR}/yaml.so" \
         && echo "extension=yaml.so" > /etc/php5/mods-available/yaml.ini \
         && php5enmod yaml \
@@ -38,12 +38,6 @@ RUN apt-get update \
         && curl -sL http://files.docker.genee.in/friso-etc.tgz | tar -zxf - -C /etc \
         && printf "extension=friso.so\n\n[friso]\nfriso.ini_file=/etc/friso/friso.ini\n" > /etc/php5/mods-available/friso.ini \
         && php5enmod friso \
-    && curl -sLo "${PHP_EXTENSION_DIR}/yaml.so" "http://files.docker.genee.in/debian/${PHP_MODULE_DIR}/yaml.so" \
-        && echo "extension=yaml.so" > /etc/php5/mods-available/yaml.ini \
-        && php5enmod yaml \
-    && mkdir -p /usr/local/bin && (curl -sL https://getcomposer.org/installer | php) \
-        && mv composer.phar /usr/local/bin/composer \
-        && echo 'export PATH="/usr/local/share/composer/vendor/bin:$PATH"' >> /etc/profile.d/composer.sh \
     && apt-get install -y alien libaio1 \
         && curl -sLo oracle.rpm \
             http://files.docker.genee.in/oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm \
@@ -52,6 +46,9 @@ RUN apt-get update \
         && curl -sLo "${PHP_EXTENSION_DIR}/oci8.so" "http://files.docker.genee.in/debian/${PHP_MODULE_DIR}/oci8.so" \
         && echo "extension=oci8.so" > /etc/php5/mods-available/oci8.ini \
         && php5enmod oci8 \
+    && mkdir -p /usr/local/bin && (curl -sL https://getcomposer.org/installer | php) \
+        && mv composer.phar /usr/local/bin/composer \
+        && echo 'export PATH="/usr/local/share/composer/vendor/bin:$PATH"' >> /etc/profile.d/composer.sh \
     && apt-get install -y python-setuptools && easy_install xlsx2csv \
     && apt-get install -y msmtp-mta git
 
